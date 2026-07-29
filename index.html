@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniCredit Institutional Gateway - Private Vault</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- GATEWAY 1: LOGIN ACCESS SCREEN -->
+    <div id="authViewport" class="auth-viewport">
+        <div class="auth-layout" style="display: flex; flex-direction: column; height: 100vh;">
+            <header class="dash-header">
+                <div class="brand-logo">
+                    <img src="logo.png" alt="UniCredit Logo" class="site-logo">
+                </div>
+                <div class="secure-tag">🔒 256-Bit TLS Institutional Node</div>
+            </header>
+            
+            <div class="auth-split-workspace" style="display: flex; flex-grow: 1;">
+                <div class="auth-promo-panel">
+                    <div class="promo-image-overlay"></div>
+                    <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80" alt="Terminal UI" class="promo-media-element">
+                    <div class="promo-content-wrapper">
+                        <h2>Unicredit Private Banking Vault</h2>
+                        <p>Global clearings, multi-currency settlements and personalized yields in one private banking solution.</p>
+                    </div>
+                </div>
+                
+                <div class="auth-action-panel">
+                    <div class="form-title-area">
+                        <h1>Clearance Gateway</h1>
+                        <p>Please present credentials to initialize data vault communication channels.</p>
+                    </div>
+                    
+                    <form id="customLoginForm" autocomplete="off">
+                        <div class="input-group">
+                            <label for="vaultUser">Corporate ID / Username</label>
+                            <input type="text" id="vaultUser" required autocomplete="new-password" placeholder="Enter corporate identifier">
+                        </div>
+                        <div class="input-group">
+                            <label for="vaultPass">Security Token / Password</label>
+                            <input type="password" id="vaultPass" required autocomplete="new-password" placeholder="••••••••••">
+                        </div>
+                        <div class="auth-options">
+                            <label class="remember-me"><input type="checkbox"> Trust workstation node</label>
+                            <a href="#" class="forgot-link" onclick="alert('Contact system clearance admin.')">Forgot token?</a>
+                        </div>
+                        <button type="submit" class="btn-auth">Verify Identity & Initialize</button>
+                    </form>
+                    
+                    <div id="authError" class="auth-error-banner" style="display: none;">
+                        <span>❌</span>
+                        <div>
+                            <strong>Authentication Rejected</strong>
+                            <p>The token combination provided does not match records within this clearance node.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GATEWAY 2: SECURE DASHBOARD -->
+    <div id="appViewport" class="app-viewport">
+        <header class="dash-header">
+            <div class="brand-logo">
+                <img src="logo.png" alt="UniCredit Logo" class="site-logo">
+            </div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div class="node-status">Node Session: <span id="headerStatus" class="status-active">Active</span></div>
+                <button id="btnSignOut" class="btn-secondary" style="width: auto; padding: 6px 14px; font-weight: 600; background: rgba(211, 16, 39, 0.1); border-color: rgba(211, 16, 39, 0.3); color: #F87171;">Sign Out</button>
+            </div>
+        </header>
+        
+        <!-- SYSTEM ALERT NOTIFICATION BANNER -->
+        <div id="portalNotification" class="portal-notification" style="display: none;">
+            <div class="notification-content">
+                <strong>CRITICAL ALERT: Transaction Execution Reversed</strong>
+                <p id="notificationText">Your recent transfer failed during secondary settlement verification. The account has been placed ON HOLD. Restricted features are temporarily disabled.</p>
+            </div>
+            <button class="btn-close-notify" onclick="dismissNotification()">Acknowledge</button>
+        </div>
+
+        <div class="dash-container">
+            <!-- SIDEBAR -->
+            <aside class="dash-sidebar">
+                <div class="sidebar-section-title">Core Banking</div>
+                <div id="navOverview" class="nav-item active">Account Summary</div>
+                <div id="navClearing" class="nav-item">Transfer Funds</div>
+                <div id="navStatements" class="nav-item">e-Statements & Reports</div>
+                
+                <div class="sidebar-section-title">Treasury Tools</div>
+                <div id="navFX" class="nav-item">Foreign Exchange Desk</div>
+                <div id="navCards" class="nav-item">Commercial Card Hub</div>
+                
+                <div class="sidebar-section-title">Security & Audit</div>
+                <div id="navLogs" class="nav-item">Node Logs</div>
+                <div id="navSettings" class="nav-item">Node Configurations</div>
+            </aside>
+            
+            <!-- MAIN DISPLAY INTERFACE -->
+            <main class="dash-main">
+                
+                <!-- PANEL 1: ACCOUNT SUMMARY -->
+                <div id="panelOverview" class="dash-panel">
+                    <div class="panel-header-flex">
+                        <h1 class="panel-title">Account Summary</h1>
+                        <span class="currency-badge">Primary Currency: EUR (€)</span>
+                    </div>
+
+                    <div class="account-meta-grid">
+                        <div class="meta-card">
+                            <span class="meta-label">Account Name</span>
+                            <span class="meta-value">Thomas Muller</span>
+                        </div>
+                        <div class="meta-card">
+                            <span class="meta-label">Account Number</span>
+                            <span class="meta-value">DE89 **** **** **** 54555 30</span>
+                        </div>
+                        <div class="meta-card">
+                            <span class="meta-label">Account Type</span>
+                            <span class="meta-value">Private Current Account</span>
+                        </div>
+                        <div class="meta-card">
+                            <span class="meta-label">System Status</span>
+                            <span id="systemStatusBadge" class="meta-value status-active-text">ACTIVE</span>
+                        </div>
+                    </div>
+                    
+                    <div class="balance-hero-card">
+                        <div class="balance-left">
+                            <span class="balance-label">Account Balance</span>
+                            <h2 class="balance-amount" id="balanceDisplay">€2,670,000.00</h2>
+                        </div>
+                        <div id="holdAlertBox" class="hold-mini-alert status-ok">
+                            <strong id="holdAlertTitle">🟢 Account Operational</strong>
+                            <p id="holdAlertBody">All outbound routing pathways and transaction nodes are fully operational.</p>
+                        </div>
+                    </div>
+
+                    <!-- SETTLEMENT TREND CHART BLOCK -->
+                    <div class="chart-container-wrapper">
+                        <div class="chart-header-flex">
+                            <h3>Settlement Trend</h3>
+                            <div class="chart-legend">
+                                <span class="legend-item"><span class="legend-box credit"></span> Credit (Incoming)</span>
+                                <span class="legend-item"><span class="legend-box debit"></span> Debit (Outgoing)</span>
+                            </div>
+                        </div>
+                        <div class="mock-chart-graphic">
+                            <div class="chart-bar bar-debit" style="height: 3%;" title="Debit: -€800"><span class="bar-date">Jan 06</span></div>
+                            <div class="chart-bar bar-credit" style="height: 30%;" title="Credit: +€150,000"><span class="bar-date">Jan 21</span></div>
+                            <div class="chart-bar bar-debit" style="height: 7%;" title="Debit: -€1,800"><span class="bar-date">Apr 14</span></div>
+                            <div class="chart-bar bar-credit" style="height: 100%;" title="Credit: +€500,000"><span class="bar-date">Jun 01</span></div>
+                        </div>
+                    </div>
+
+                    <div class="ledger-wrapper">
+                        <h3>Recent Transactions</h3>
+                        <table class="ledger-table">
+                            <thead>
+                                <tr>
+                                    <th>Value Date</th>
+                                    <th>Reference ID</th>
+                                    <th>Description / Counterparty</th>
+                                    <th>Routing Chain</th>
+                                    <th>Amount (EUR)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ledgerTbody">
+                                <tr>
+                                    <td>2026-06-01</td>
+                                    <td><code>UNGP20260601XJ7K9</code></td>
+                                    <td>UN Grant Disbursement / United Nations</td>
+                                    <td>FEDWIRE Direct</td>
+                                    <td class="amt-credit">+€500,000.00</td>
+                                    <td><span class="badge-success">Settled</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2026-04-14</td>
+                                    <td><code>POS448291026AB3V</code></td>
+                                    <td>POS Purchase – Retail Outlet / ElectroStore Berlin</td>
+                                    <td>Revolut (UK) – Mastercard – Sparkasse (DE)</td>
+                                    <td class="amt-debit">-€1,800.00</td>
+                                    <td><span class="badge-success">Settled</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2026-01-21</td>
+                                    <td><code>GTS20260121M5N8Q</code></td>
+                                    <td>Invoice Settled / GlobalTech Solutions</td>
+                                    <td>SWIFT MT103</td>
+                                    <td class="amt-credit">+€150,000.00</td>
+                                    <td><span class="badge-success">Settled</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2026-01-06</td>
+                                    <td><code>SMX20260106R9P2W</code></td>
+                                    <td>POS Purchase – Supermarket / EuroMart Frankfurt</td>
+                                    <td>Revolut (UK) – Mastercard – Sparkasse (DE)</td>
+                                    <td class="amt-debit">-€800.00</td>
+                                    <td><span class="badge-success">Settled</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- PANEL 2: TRANSFER FUNDS -->
+                <div id="panelClearing" class="dash-panel" style="display: none;">
+                    <h1 class="panel-title">Transfer Funds</h1>
+                    <p style="color: var(--text-muted); margin-bottom: 25px;">Initiate a domestic or international money transfer instantly below.</p>
+                    
+                    <div class="form-container">
+                        <form id="wireTransferForm">
+                            <div class="form-row">
+                                <div class="input-group">
+                                    <label>Bank Name</label>
+                                    <input type="text" id="wireBank" required placeholder="e.g. UniCredit SpA">
+                                </div>
+                                <div class="input-group">
+                                    <label>Routing Transit Number / SWIFT BIC</label>
+                                    <input type="text" id="wireRouting" required placeholder="9-digit code or SWIFT key">
+                                </div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label>Beneficiary Account Number / IBAN</label>
+                                <input type="text" id="wireAccount" required placeholder="Enter destination account string">
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="input-group">
+                                    <label>Transfer Amount (EUR)</label>
+                                    <input type="number" id="wireAmount" required min="1" placeholder="0.00">
+                                </div>
+                                <div class="input-group">
+                                    <label>Processing Speed Priority</label>
+                                    <select id="wirePriority">
+                                        <option value="Standard">Standard Settlement Chain (1-2 Days)</option>
+                                        <option value="Urgent">Real-Time Gross Settlement (Instant)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Transaction Reference / Description</label>
+                                <input type="text" id="wireReference" placeholder="e.g. Invoice Payment / Invoice #1024">
+                            </div>
+                            
+                            <button type="submit" id="btnTransferSubmit" class="btn-transfer">Authorize Outbound Remittance</button>
+                        </form>
+                    </div>
+
+                    <div id="transferRejectionBox" class="rejection-box" style="display: none;">
+                        <h3>Transaction Routing Exception</h3>
+                        <p>The transmission payload was aborted. <strong>Error Code: ERR_NODE_HOLD_RESTRICTION</strong>. The outbound pipeline rejected the transfer because this account node is currently flagged as <strong>ON HOLD</strong>.</p>
+                    </div>
+                </div>
+
+                <!-- PANEL 3: e-STATEMENTS -->
+                <div id="panelStatements" class="dash-panel" style="display: none;">
+                    <h1 class="panel-title">e-Statements & Financial Reports</h1>
+                    <p style="color: var(--text-muted); margin-bottom: 25px;">Download official institutional audit trail documents.</p>
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <div class="doc-icon">📄</div>
+                            <h3>Q2 2026 Audit Statement</h3>
+                            <p>Generated: July 01, 2026 • PDF (2.4 MB)</p>
+                            <button class="btn-secondary" onclick="alert('Downloading Q2 2026 Audit Statement...')">Download Report</button>
+                        </div>
+                        <div class="report-card">
+                            <div class="doc-icon">📄</div>
+                            <h3>Annual Tax Assessment 2025</h3>
+                            <p>Generated: Jan 15, 2026 • PDF (5.1 MB)</p>
+                            <button class="btn-secondary" onclick="alert('Downloading Annual Tax Assessment 2025...')">Download Report</button>
+                        </div>
+                        <div class="report-card">
+                            <div class="doc-icon">📊</div>
+                            <h3>Corporate Settlement Ledger Q1</h3>
+                            <p>Generated: Apr 02, 2026 • CSV (1.1 MB)</p>
+                            <button class="btn-secondary" onclick="alert('Downloading Q1 Ledger...')">Download Report</button>
+                        </div>
+                        <div class="report-card">
+                            <div class="doc-icon">🧾</div>
+                            <h3>Treasury Yield Summary 2025</h3>
+                            <p>Generated: Dec 31, 2025 • PDF (3.8 MB)</p>
+                            <button class="btn-secondary" onclick="alert('Downloading Yield Summary...')">Download Report</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PANEL 4: FX -->
+                <div id="panelFX" class="dash-panel" style="display: none;">
+                    <h1 class="panel-title">Foreign Exchange Desk</h1>
+                    <p style="color: var(--text-muted); margin-bottom: 25px;">Live institutional FX liquidity pools and spot currency conversion.</p>
+                    <div class="fx-rates-grid">
+                        <div class="fx-card">
+                            <span class="fx-pair">EUR / USD</span>
+                            <span class="fx-rate">1.0894</span>
+                            <span class="fx-change pos">+0.12%</span>
+                        </div>
+                        <div class="fx-card">
+                            <span class="fx-pair">EUR / GBP</span>
+                            <span class="fx-rate">0.8432</span>
+                            <span class="fx-change neg">-0.05%</span>
+                        </div>
+                        <div class="fx-card">
+                            <span class="fx-pair">EUR / JPY</span>
+                            <span class="fx-rate">172.45</span>
+                            <span class="fx-change pos">+0.48%</span>
+                        </div>
+                        <div class="fx-card">
+                            <span class="fx-pair">EUR / CHF</span>
+                            <span class="fx-rate">0.9512</span>
+                            <span class="fx-change pos">+0.03%</span>
+                        </div>
+                        <div class="fx-card">
+                            <span class="fx-pair">EUR / CAD</span>
+                            <span class="fx-rate">1.4910</span>
+                            <span class="fx-change neg">-0.18%</span>
+                        </div>
+                        <div class="fx-card">
+                            <span class="fx-pair">EUR / AUD</span>
+                            <span class="fx-rate">1.6340</span>
+                            <span class="fx-change pos">+0.22%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PANEL 5: CARDS -->
+                <div id="panelCards" class="dash-panel" style="display: none;">
+                    <h1 class="panel-title">Commercial Card Hub</h1>
+                    <p style="color: var(--text-muted); margin-bottom: 25px;">Manage corporate physical and virtual cards.</p>
+                    
+                    <div class="cards-wrapper">
+                        <!-- Blue Bank Commercial Card -->
+                        <div class="blue-commercial-card">
+                            <div class="card-top">
+                                <span class="card-brand-title">UniCredit Private</span>
+                                <span class="card-chip-symbol">💳</span>
+                            </div>
+                            <div class="card-number-display">
+                                DE89 **** **** **** 54555 30
+                            </div>
+                            <div class="card-info-footer">
+                                <div>
+                                    <div class="card-sub-label">CARD HOLDER</div>
+                                    <div class="card-sub-val">THOMAS MULLER</div>
+                                </div>
+                                <div>
+                                    <div class="card-sub-label">EXPIRES</div>
+                                    <div class="card-sub-val">08/28</div>
+                                </div>
+                                <div>
+                                    <div class="card-sub-label">MONTHLY LIMIT</div>
+                                    <div class="card-sub-val">€50,000</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-actions-grid">
+                            <div class="meta-card">
+                                <span class="meta-label">Linked Account</span>
+                                <span class="meta-value">DE89 7002 0270 0012 3456 78</span>
+                            </div>
+                            <div class="meta-card">
+                                <span class="meta-label">Card Status</span>
+                                <span class="meta-value status-active-text">ACTIVE / UNLOCKED</span>
+                            </div>
+                            <div class="meta-card">
+                                <span class="meta-label">Available Credit Limit</span>
+                                <span class="meta-value">€48,200.00 / €50,000.00</span>
+                            </div>
+                            <div class="meta-card">
+                                <span class="meta-label">Security Protocol</span>
+                                <span class="meta-value">3D Secure v2 Enabled</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PANEL 6: LOGS -->
+                <div id="panelLogs" class="dash-panel" style="display: none;">
+                    <h1 class="panel-title">System Node Activity Logs</h1>
+                    <div class="logs-console">
+                        <div class="log-entry">[SYSTEM] Initializing UniCredit secure handshake connection...</div>
+                        <div class="log-entry">[SYSTEM] Global network shards synchronized successfully.</div>
+                        <div class="log-entry" style="color: var(--success);">[STATUS] Node status profile: ACTIVE. All liquidity pools online.</div>
+                        <div id="dynamicLogHook"></div>
+                    </div>
+                </div>
+
+                <!-- PANEL 7: CONFIGURATIONS -->
+                <div id="panelSettings" class="dash-panel" style="display: none;">
+                    <h1 class="panel-title">Node Configurations</h1>
+                    <p style="color: var(--text-muted); margin-bottom: 25px;">Adjust network routing preferences and API key permissions.</p>
+                    <div class="form-container">
+                        <div class="input-group">
+                            <label>API Key Clearance Identifier</label>
+                            <input type="text" value="UNC_LIVE_88301928471" readonly>
+                        </div>
+                        <div class="input-group">
+                            <label>Default Clearance Priority</label>
+                            <select disabled>
+                                <option>RTGS Instant Settlement System</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DISTINCT FOOTER -->
+                <footer class="app-footer">
+                    <div class="footer-content-inner">
+                        <p>© 2026 UniCredit S.p.A.</p>
+                        <p class="footer-links-row">
+                            <a href="privacy.html">Privacy Policy</a> | 
+                            <a href="terms.html">Terms</a> | 
+                            <a href="security.html">Security</a> | 
+                            <a href="contact.html">Contact</a> | 
+                            <a href="support.html">Support</a>
+                        </p>
+                        <p class="footer-sub-text">Regulated by ECB | For Authorized Users Only | <a href="advisor.html">Message Your Advisor</a></p>
+                    </div>
+                </footer>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL: TRANSACTION PROCESSING NOTIFICATION SCREEN -->
+    <div id="successModal" class="modal-overlay" style="display: none;">
+        <div class="modal-card excited-modal" style="text-align: center; padding: 40px; background: #121824; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; max-width: 500px; width: 90%; color: #fff;">
+            
+            <div class="avatar-3d-scene" style="margin-bottom: 20px;">
+                <div class="hourglass" style="font-size: 3.5rem; display: flex; justify-content: center; align-items: center; animation: pulse 1.5s infinite;">⏳</div>
+            </div>
+            
+            <h2 style="margin-bottom: 10px; font-size: 1.5rem;">Outbound Remittance Processing</h2>
+            <p class="success-subtitle" style="color: #94A3B8; font-size: 0.95rem; margin-bottom: 25px;">
+                Your wire transfer payload has been successfully dispatched to the central bank clearing network. Secondary cryptographic verification is underway.
+            </p>
+            
+            <div class="timer-card" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 15px; border-radius: 8px; margin-bottom: 25px;">
+                <span class="timer-label" style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748B; margin-bottom: 5px;">Time Elapsed Since Settlement Request</span>
+                <div class="timer-display" id="liveTimerDisplay" style="font-family: monospace; font-size: 1.8rem; font-weight: 700; color: #38BDF8;">00:00:00</div>
+                <span class="timer-footnote" style="display: block; font-size: 0.75rem; color: #64748B; margin-top: 5px;">Estimated Clearing Window: 02:00:00 Max</span>
+            </div>
+
+            <button class="btn-auth" onclick="closeSuccessModal()" style="background: #D31027; color: white; border: none; padding: 12px 20px; font-weight: 600; border-radius: 6px; cursor: pointer; width: 100%;">Return to Ledger Summary</button>
+        </div>
+    </div>
+
+    <!-- Updated JavaScript handling the special PIN prompt feature -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const reportButtons = document.querySelectorAll("#panelStatements .report-card button");
+            
+            reportButtons.forEach(button => {
+                // Clear out existing inline click handlers if any
+                button.removeAttribute("onclick");
+                
+                button.addEventListener("click", function() {
+                    const cardTitle = this.parentElement.querySelector("h3").innerText;
+                    
+                    // Prompt user for special PIN
+                    const userPin = prompt(`Security Clearance Required: Enter special PIN to download audit trail (${cardTitle}):`);
+                    
+                    if (userPin !== null) {
+                        if (userPin.trim() !== "") {
+                            // Proceed with download sequence if PIN is provided
+                            alert(`Special PIN accepted. Downloading ${cardTitle}...`);
+                        } else {
+                            alert("Download aborted: PIN cannot be empty.");
+                        }
+                    } else {
+                        alert("Download cancelled.");
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>
