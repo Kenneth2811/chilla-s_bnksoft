@@ -5,33 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UniCredit Institutional Gateway - Private Vault</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        /* Modern Header Display Styles for Last Login & System Date */
-        .header-system-meta {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            color: #94A3B8;
-        }
-        .header-system-meta div span {
-            color: #38BDF8;
-            font-weight: 500;
-        }
-    </style>
 </head>
 <body>
 
     <!-- GATEWAY 1: LOGIN ACCESS SCREEN -->
     <div id="authViewport" class="auth-viewport">
-        <div class="auth-layout" style="display: flex; flex-direction: column; height: 100vh;">
+        <div class="auth-layout" style="display: flex; flex-direction: column; height: 10vh;">
             <header class="dash-header">
                 <div class="brand-logo">
-                    <img src="logo.png" alt="UniCredit Logo" class="site-logo">
+                    <img src="logo.png" alt="UniCredit Logo" class="site-logo" style="height: 110px; width: auto;">
                 </div>
                 <div class="secure-tag">🔒 256-Bit TLS Institutional Node</div>
             </header>
@@ -84,16 +66,26 @@
     <div id="appViewport" class="app-viewport">
         <header class="dash-header">
             <div class="brand-logo">
-                <img src="logo.png" alt="UniCredit Logo" class="site-logo">
+                <img src="logo.png" alt="UniCredit Logo" class="site-logo" style="height: 110px; width: auto;">
             </div>
-            <!-- Prominent, clean, modern, and professional header display for Last Login & System Date -->
-            <div style="display: flex; align-items: center; gap: 20px;">
+            
+            <!-- Modern Responsive Header Metadata (Last Login & System Date/Time) -->
+            <div class="header-system-meta-container">
                 <div class="header-system-meta">
-                    <div>Last Login: <span id="headerLastLogin">Loading...</span></div>
-                    <div style="border-left: 1px solid rgba(255,255,255,0.15); padding-left: 15px;">System Date: <span id="headerSystemDate">Loading...</span></div>
+                    <div class="meta-item">
+                        <span class="meta-label-lbl">Last Login:</span> 
+                        <span id="headerLastLogin">Loading...</span>
+                    </div>
+                    <div class="meta-divider"></div>
+                    <div class="meta-item">
+                        <span class="meta-label-lbl">System Date:</span> 
+                        <span id="headerSystemDate">Loading...</span>
+                    </div>
                 </div>
-                <div class="node-status">Node Session: <span id="headerStatus" class="status-active">Active</span></div>
-                <button id="btnSignOut" class="btn-secondary" style="width: auto; padding: 6px 14px; font-weight: 600; background: rgba(211, 16, 39, 0.1); border-color: rgba(211, 16, 39, 0.3); color: #F87171;">Sign Out</button>
+                <div class="header-action-group">
+                    <div class="node-status">Session: <span id="headerStatus" class="status-active">Active</span></div>
+                    <button id="btnSignOut" class="btn-secondary btn-signout-custom">Sign Out</button>
+                </div>
             </div>
         </header>
         
@@ -129,7 +121,6 @@
                 <!-- PANEL 1: ACCOUNT SUMMARY -->
                 <div id="panelOverview" class="dash-panel">
                     
-                    <!-- BANK-STYLE LOGIN WELCOME INFORMATION SECTION -->
                     <div id="bankWelcomeSection" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 20px; border-radius: 10px; margin-bottom: 25px;">
                         <h2 id="welcomeMsgTitle" style="font-size: 1.25rem; color: #fff; margin-bottom: 8px;">Welcome back, Thomas Muller.</h2>
                         <div style="font-size: 0.85rem; color: #38BDF8; font-weight: 500;">🔔 Security Notice: 256-bit institutional encryption active. No unauthorized session interruptions reported.</div>
@@ -274,8 +265,8 @@
                                 <div class="input-group">
                                     <label>Processing Speed Priority</label>
                                     <select id="wirePriority">
-                                        <option value="Standard">Standard Settlement Chain (4 Hours)</option>
-                                        <option value="Urgent">Urgent Settlement Priority</option>
+                                        <option value="Standard Settlement">Standard Settlement</option>
+                                        <option value="Real-time Processing">Real-time Processing</option>
                                     </select>
                                 </div>
                             </div>
@@ -489,7 +480,7 @@
             <div class="timer-card" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 15px; border-radius: 8px; margin-bottom: 25px;">
                 <span class="timer-label" style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748B; margin-bottom: 5px;">Time Elapsed Since Settlement Request</span>
                 <div class="timer-display" id="liveTimerDisplay" style="font-family: monospace; font-size: 1.8rem; font-weight: 700; color: #38BDF8;">00:00:00</div>
-                <span class="timer-footnote" style="display: block; font-size: 0.75rem; color: #64748B; margin-top: 5px;">Estimated Clearing Window: 02:00:00 Max</span>
+                <span class="timer-footnote" style="display: block; font-size: 0.75rem; color: #64748B; margin-top: 5px;">Estimated Clearing Window: 04:00:00 Max</span>
             </div>
 
             <button class="btn-auth" onclick="closeSuccessModal()" style="background: #D31027; color: white; border: none; padding: 12px 20px; font-weight: 600; border-radius: 6px; cursor: pointer; width: 100%;">Return to Ledger Summary</button>
@@ -611,27 +602,24 @@
                     const amount = parseFloat(document.getElementById("wireAmount").value);
                     const reference = document.getElementById("wireReference").value || "Outbound Wire Transfer";
                     const routing = document.getElementById("wireRouting").value;
+                    const priorityOption = document.getElementById("wirePriority").value;
 
                     if (isNaN(amount) || amount <= 0) {
                         alert("Please enter a valid transfer amount.");
                         return;
                     }
 
+                    // --- SERVER SYSTEM DATE & TIME SOURCE OF TRUTH ---
                     const serverTimestamp = Date.now();
                     const dateString = new Date(serverTimestamp).toISOString().split('T')[0];
                     
-                    // --- UPDATED REFERENCE ID GENERATION LOGIC ---
-                    // 1. Determine base source text (Description, Bank, or Counterparty name)
                     const sourceText = (reference || bank || "").trim();
-                    
-                    // 2. Extract first 4 letters/characters for the initials prefix, padded or cleaned as uppercase letters/alphanumerics
                     let cleanSource = sourceText.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
                     let prefix = cleanSource.substring(0, 4);
                     while (prefix.length < 4) {
-                        prefix += "X"; // Padding fallback if text is too short
+                        prefix += "X";
                     }
 
-                    // 3. Generate remaining unique alphanumeric characters to ensure total length is exactly 17 characters (17 - 4 = 13 characters)
                     const randomPartLength = 17 - prefix.length;
                     let randomSuffix = "";
                     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -640,13 +628,12 @@
                     }
 
                     const refId = prefix + randomSuffix;
-                    // ---------------------------------------------
 
                     const newTransaction = {
                         id: refId,
                         date: dateString,
                         timestamp: serverTimestamp,
-                        description: `${reference} / ${bank}`,
+                        description: `${reference} / ${bank} (${priorityOption})`,
                         routing: `SWIFT/RTGS (${routing})`,
                         amount: -amount,
                         type: "debit",
@@ -687,6 +674,9 @@
             if (!localStorage.getItem("uc_account_balance")) {
                 localStorage.setItem("uc_account_balance", "2670000.00");
             }
+            if (!localStorage.getItem("uc_account_status")) {
+                localStorage.setItem("uc_account_status", "Active");
+            }
             if (!localStorage.getItem("uc_last_login")) {
                 localStorage.setItem("uc_last_login", new Date().toUTCString());
             }
@@ -709,6 +699,7 @@
             renderAccountBalance();
             renderTransactionLedger();
             renderAnalyticsAndGraphs();
+            renderAccountStatusDisplay();
             enforceBackendAuthorization();
             updateWelcomeClockSection();
         }
@@ -718,6 +709,44 @@
             const currentBalance = parseFloat(localStorage.getItem("uc_account_balance")) || 2670000.00;
             if (balanceElem) {
                 balanceElem.textContent = "€" + currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+        }
+
+        function renderAccountStatusDisplay() {
+            const accountStatus = localStorage.getItem("uc_account_status") || "Active";
+            const systemStatusBadge = document.getElementById("systemStatusBadge");
+            const holdAlertBox = document.getElementById("holdAlertBox");
+            const holdAlertTitle = document.getElementById("holdAlertTitle");
+            const holdAlertBody = document.getElementById("holdAlertBody");
+
+            if (systemStatusBadge) {
+                if (accountStatus === "On Hold") {
+                    systemStatusBadge.textContent = "ON HOLD";
+                    systemStatusBadge.className = "meta-value status-hold-text";
+                    systemStatusBadge.style.color = "#F87171";
+                } else {
+                    systemStatusBadge.textContent = "ACTIVE";
+                    systemStatusBadge.className = "meta-value status-active-text";
+                    systemStatusBadge.style.color = "";
+                }
+            }
+
+            if (holdAlertBox && holdAlertTitle && holdAlertBody) {
+                if (accountStatus === "On Hold") {
+                    holdAlertBox.className = "hold-mini-alert status-warn";
+                    holdAlertBox.style.borderColor = "rgba(248, 113, 113, 0.4)";
+                    holdAlertBox.style.background = "rgba(248, 113, 113, 0.08)";
+                    holdAlertTitle.textContent = "⚠️ Account Status: On Hold";
+                    holdAlertTitle.style.color = "#F87171";
+                    holdAlertBody.textContent = "Your account has been temporarily placed on hold following an unsuccessful transaction during processing. Some account services may be temporarily restricted while this matter is reviewed. Please contact Customer Support for further assistance.";
+                } else {
+                    holdAlertBox.className = "hold-mini-alert status-ok";
+                    holdAlertBox.style.borderColor = "";
+                    holdAlertBox.style.background = "";
+                    holdAlertTitle.textContent = "🟢 Account Operational";
+                    holdAlertTitle.style.color = "";
+                    holdAlertBody.textContent = "All outbound routing pathways and transaction nodes are fully operational.";
+                }
             }
         }
 
@@ -786,6 +815,7 @@
             if (confirm("Developer Reset Protocol: This will purge all user records, restore default demo data, and recalibrate system states. Proceed?")) {
                 localStorage.setItem("uc_transactions", JSON.stringify(getInitialHardcodedTransactions()));
                 localStorage.setItem("uc_account_balance", "2670000.00");
+                localStorage.setItem("uc_account_status", "Active");
                 localStorage.setItem("uc_last_login", new Date().toUTCString());
                 localStorage.removeItem("uc_tx_status");
                 localStorage.removeItem("uc_tx_created");
@@ -814,18 +844,11 @@
         }
 
         function updateWelcomeClockSection() {
-            const lastLoginElem = document.getElementById("welcomeLastLogin");
-            const systemDateElem = document.getElementById("welcomeSystemDate");
             const headerLastLoginElem = document.getElementById("headerLastLogin");
             const headerSystemDateElem = document.getElementById("headerSystemDate");
             
             const storedLastLogin = localStorage.getItem("uc_last_login") || new Date().toUTCString();
             const serverNowString = new Date().toUTCString();
-
-            if (lastLoginElem && systemDateElem) {
-                lastLoginElem.textContent = `Last login: ${storedLastLogin}`;
-                systemDateElem.textContent = `System date: ${serverNowString}`;
-            }
 
             if (headerLastLoginElem && headerSystemDateElem) {
                 headerLastLoginElem.textContent = storedLastLogin;
@@ -833,21 +856,39 @@
             }
         }
 
+        // --- UPDATED LIFECYCLE EVALUATION: 4-HOUR SERVER TIMING RULE ---
         function evaluateTransactionLifecycle() {
             let transactions = JSON.parse(localStorage.getItem("uc_transactions")) || [];
             let updated = false;
 
             transactions.forEach(tx => {
-                if (tx.status === "Processing" && (Date.now() - tx.timestamp > 30000)) {
-                    tx.status = "Settled";
+                // 4 hours = 14,400,000 milliseconds based on server date/time check (Date.now())
+                if (tx.status === "Processing" && (Date.now() - tx.timestamp > 14400000)) {
+                    tx.status = "Failed";
                     updated = true;
-                    appendLog(`[GATEWAY] Transaction ${tx.id} cleared successfully by settlement node.`);
+                    
+                    // Automatically place customer account status on hold
+                    localStorage.setItem("uc_account_status", "On Hold");
+                    
+                    // Trigger bank-style notification banner
+                    showPortalNotification("Account Status: On Hold\nYour account has been temporarily placed on hold following an unsuccessful transaction during processing. Some account services may be temporarily restricted while this matter is reviewed. Please contact Customer Support for further assistance.");
+
+                    appendLog(`[GATEWAY] Transaction ${tx.id} marked as Failed after 4 hours elapsed server time. Account set to On Hold.`);
                 }
             });
 
             if (updated) {
                 localStorage.setItem("uc_transactions", JSON.stringify(transactions));
                 renderApplicationState();
+            }
+        }
+
+        function showPortalNotification(messageText) {
+            const banner = document.getElementById("portalNotification");
+            const textElem = document.getElementById("notificationText");
+            if (banner && textElem) {
+                textElem.innerText = messageText;
+                banner.style.display = "flex";
             }
         }
 
