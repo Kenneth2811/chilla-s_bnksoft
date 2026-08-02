@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UniCredit Institutional Gateway - Private Vault</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Modern Header Display Styles for Last Login & System Date */
+        .header-system-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #94A3B8;
+        }
+        .header-system-meta div span {
+            color: #38BDF8;
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
 
@@ -68,7 +86,12 @@
             <div class="brand-logo">
                 <img src="logo.png" alt="UniCredit Logo" class="site-logo">
             </div>
+            <!-- Prominent, clean, modern, and professional header display for Last Login & System Date -->
             <div style="display: flex; align-items: center; gap: 20px;">
+                <div class="header-system-meta">
+                    <div>Last Login: <span id="headerLastLogin">Loading...</span></div>
+                    <div style="border-left: 1px solid rgba(255,255,255,0.15); padding-left: 15px;">System Date: <span id="headerSystemDate">Loading...</span></div>
+                </div>
                 <div class="node-status">Node Session: <span id="headerStatus" class="status-active">Active</span></div>
                 <button id="btnSignOut" class="btn-secondary" style="width: auto; padding: 6px 14px; font-weight: 600; background: rgba(211, 16, 39, 0.1); border-color: rgba(211, 16, 39, 0.3); color: #F87171;">Sign Out</button>
             </div>
@@ -105,6 +128,13 @@
                 
                 <!-- PANEL 1: ACCOUNT SUMMARY -->
                 <div id="panelOverview" class="dash-panel">
+                    
+                    <!-- BANK-STYLE LOGIN WELCOME INFORMATION SECTION -->
+                    <div id="bankWelcomeSection" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 20px; border-radius: 10px; margin-bottom: 25px;">
+                        <h2 id="welcomeMsgTitle" style="font-size: 1.25rem; color: #fff; margin-bottom: 8px;">Welcome back, Thomas Muller.</h2>
+                        <div style="font-size: 0.85rem; color: #38BDF8; font-weight: 500;">🔔 Security Notice: 256-bit institutional encryption active. No unauthorized session interruptions reported.</div>
+                    </div>
+
                     <div class="panel-header-flex">
                         <h1 class="panel-title">Account Summary</h1>
                         <span class="currency-badge">Primary Currency: EUR (€)</span>
@@ -215,6 +245,11 @@
                     
                     <div class="form-container">
                         <form id="wireTransferForm">
+                            <div class="input-group">
+                                <label>Recipient Name</label>
+                                <input type="text" id="wireRecipientName" placeholder="Enter recipient or beneficiary name">
+                            </div>
+
                             <div class="form-row">
                                 <div class="input-group">
                                     <label>Bank Name</label>
@@ -239,8 +274,8 @@
                                 <div class="input-group">
                                     <label>Processing Speed Priority</label>
                                     <select id="wirePriority">
-                                        <option value="Standard">Standard Settlement Chain (1-2 Days)</option>
-                                        <option value="Urgent">Real-Time Gross Settlement (Instant)</option>
+                                        <option value="Standard">Standard Settlement Chain (4 Hours)</option>
+                                        <option value="Urgent">Urgent Settlement Priority</option>
                                     </select>
                                 </div>
                             </div>
@@ -269,25 +304,25 @@
                             <div class="doc-icon">📄</div>
                             <h3>Q2 2026 Audit Statement</h3>
                             <p>Generated: July 01, 2026 • PDF (2.4 MB)</p>
-                            <button class="btn-secondary" onclick="alert('Downloading Q2 2026 Audit Statement...')">Download Report</button>
+                            <button class="btn-secondary">Download Report</button>
                         </div>
                         <div class="report-card">
                             <div class="doc-icon">📄</div>
                             <h3>Annual Tax Assessment 2025</h3>
                             <p>Generated: Jan 15, 2026 • PDF (5.1 MB)</p>
-                            <button class="btn-secondary" onclick="alert('Downloading Annual Tax Assessment 2025...')">Download Report</button>
+                            <button class="btn-secondary">Download Report</button>
                         </div>
                         <div class="report-card">
                             <div class="doc-icon">📊</div>
                             <h3>Corporate Settlement Ledger Q1</h3>
                             <p>Generated: Apr 02, 2026 • CSV (1.1 MB)</p>
-                            <button class="btn-secondary" onclick="alert('Downloading Q1 Ledger...')">Download Report</button>
+                            <button class="btn-secondary">Download Report</button>
                         </div>
                         <div class="report-card">
                             <div class="doc-icon">🧾</div>
                             <h3>Treasury Yield Summary 2025</h3>
                             <p>Generated: Dec 31, 2025 • PDF (3.8 MB)</p>
-                            <button class="btn-secondary" onclick="alert('Downloading Yield Summary...')">Download Report</button>
+                            <button class="btn-secondary">Download Report</button>
                         </div>
                     </div>
                 </div>
@@ -336,7 +371,6 @@
                     <p style="color: var(--text-muted); margin-bottom: 25px;">Manage corporate physical and virtual cards.</p>
                     
                     <div class="cards-wrapper">
-                        <!-- Blue Bank Commercial Card -->
                         <div class="blue-commercial-card">
                             <div class="card-top">
                                 <span class="card-brand-title">UniCredit Private</span>
@@ -408,6 +442,15 @@
                                 <option>RTGS Instant Settlement System</option>
                             </select>
                         </div>
+
+                        <div id="developerConsoleSection" style="margin-top: 40px; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: none;">
+                            <h3 style="color: #F87171; margin-bottom: 15px;">⚠️ RDCH</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">node purging.</p>
+                            
+                            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                                <button type="button" id="btnDevReset" class="btn-secondary" style="background: rgba(211, 16, 39, 0.15); border-color: rgba(211, 16, 39, 0.4); color: #F87171; font-weight: 600;">Purge</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -453,24 +496,20 @@
         </div>
     </div>
 
-    <!-- Updated JavaScript handling the special PIN prompt feature -->
+    <!-- SCRIPT HANDLING PIN PROMPTS & CORE ENHANCED APP LOGIC -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const reportButtons = document.querySelectorAll("#panelStatements .report-card button");
             
             reportButtons.forEach(button => {
-                // Clear out existing inline click handlers if any
                 button.removeAttribute("onclick");
                 
                 button.addEventListener("click", function() {
                     const cardTitle = this.parentElement.querySelector("h3").innerText;
-                    
-                    // Prompt user for special PIN
                     const userPin = prompt(`Security Clearance Required: Enter special PIN to download audit trail (${cardTitle}):`);
                     
                     if (userPin !== null) {
                         if (userPin.trim() !== "") {
-                            // Proceed with download sequence if PIN is provided
                             alert(`Special PIN accepted. Downloading ${cardTitle}...`);
                         } else {
                             alert("Download aborted: PIN cannot be empty.");
@@ -482,6 +521,387 @@
             });
         });
     </script>
-    <script src="app.js"></script>
+    <script>
+        // ENHANCED TRANSACTION PROCESSING & STATE MANAGEMENT SYSTEM
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const loginForm = document.getElementById("customLoginForm");
+            const authViewport = document.getElementById("authViewport");
+            const appViewport = document.getElementById("appViewport");
+            const authError = document.getElementById("authError");
+            const signOutBtn = document.getElementById("btnSignOut");
+
+            const VALID_USER = "Thomas301";
+            const VALID_PASS = "T@Muller1";
+            const DEVELOPER_ROLE_KEY = "UNC_DEV_AUTH_PASSTHRU";
+
+            initializeDataStore();
+
+            if (localStorage.getItem("uc_session_active") === "true") {
+                if (authViewport) authViewport.style.display = "none";
+                if (appViewport) appViewport.style.display = "flex";
+                renderApplicationState();
+            }
+
+            if (loginForm) {
+                loginForm.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    const usernameInput = document.getElementById("vaultUser").value.trim();
+                    const passwordInput = document.getElementById("vaultPass").value;
+
+                    if (usernameInput === VALID_USER && passwordInput === VALID_PASS) {
+                        authError.style.display = "none";
+                        authViewport.style.display = "none";
+                        appViewport.style.display = "flex";
+                        localStorage.setItem("uc_session_active", "true");
+                        localStorage.setItem(DEVELOPER_ROLE_KEY, "true");
+                        
+                        const currentLoginTime = new Date().toUTCString();
+                        localStorage.setItem("uc_last_login", currentLoginTime);
+
+                        appendLog(`[AUTH] Clearance granted for corporate identifier: ${VALID_USER}`);
+                        renderApplicationState();
+                    } else {
+                        authError.style.display = "flex";
+                        appendLog(`[SECURITY] Authentication failed for user string: ${usernameInput}`);
+                    }
+                });
+            }
+
+            if (signOutBtn) {
+                signOutBtn.addEventListener("click", function () {
+                    localStorage.removeItem("uc_session_active");
+                    localStorage.removeItem(DEVELOPER_ROLE_KEY);
+                    appViewport.style.display = "none";
+                    authViewport.style.display = "flex";
+                    document.getElementById("vaultUser").value = "";
+                    document.getElementById("vaultPass").value = "";
+                });
+            }
+
+            const navItems = {
+                navOverview: "panelOverview",
+                navClearing: "panelClearing",
+                navStatements: "panelStatements",
+                navFX: "panelFX",
+                navCards: "panelCards",
+                navLogs: "panelLogs",
+                navSettings: "panelSettings"
+            };
+
+            Object.keys(navItems).forEach(navId => {
+                const item = document.getElementById(navId);
+                if (item) {
+                    item.addEventListener("click", function () {
+                        document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
+                        this.classList.add("active");
+                        document.querySelectorAll(".dash-panel").forEach(panel => panel.style.display = "none");
+                        const targetPanel = document.getElementById(navItems[navId]);
+                        if (targetPanel) targetPanel.style.display = "block";
+                    });
+                }
+            });
+
+            const wireForm = document.getElementById("wireTransferForm");
+            if (wireForm) {
+                wireForm.addEventListener("submit", function (e) {
+                    e.preventDefault();
+
+                    const bank = document.getElementById("wireBank").value;
+                    const amount = parseFloat(document.getElementById("wireAmount").value);
+                    const reference = document.getElementById("wireReference").value || "Outbound Wire Transfer";
+                    const routing = document.getElementById("wireRouting").value;
+
+                    if (isNaN(amount) || amount <= 0) {
+                        alert("Please enter a valid transfer amount.");
+                        return;
+                    }
+
+                    const serverTimestamp = Date.now();
+                    const dateString = new Date(serverTimestamp).toISOString().split('T')[0];
+                    
+                    // --- UPDATED REFERENCE ID GENERATION LOGIC ---
+                    // 1. Determine base source text (Description, Bank, or Counterparty name)
+                    const sourceText = (reference || bank || "").trim();
+                    
+                    // 2. Extract first 4 letters/characters for the initials prefix, padded or cleaned as uppercase letters/alphanumerics
+                    let cleanSource = sourceText.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+                    let prefix = cleanSource.substring(0, 4);
+                    while (prefix.length < 4) {
+                        prefix += "X"; // Padding fallback if text is too short
+                    }
+
+                    // 3. Generate remaining unique alphanumeric characters to ensure total length is exactly 17 characters (17 - 4 = 13 characters)
+                    const randomPartLength = 17 - prefix.length;
+                    let randomSuffix = "";
+                    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                    for (let i = 0; i < randomPartLength; i++) {
+                        randomSuffix += chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
+
+                    const refId = prefix + randomSuffix;
+                    // ---------------------------------------------
+
+                    const newTransaction = {
+                        id: refId,
+                        date: dateString,
+                        timestamp: serverTimestamp,
+                        description: `${reference} / ${bank}`,
+                        routing: `SWIFT/RTGS (${routing})`,
+                        amount: -amount,
+                        type: "debit",
+                        status: "Processing",
+                        isUserCreated: true
+                    };
+
+                    persistAndProcessNewTransaction(newTransaction);
+                    wireForm.reset();
+                    openSuccessModal();
+                });
+            }
+
+            const btnDevReset = document.getElementById("btnDevReset");
+            if (btnDevReset) {
+                btnDevReset.addEventListener("click", function () {
+                    executeBackendDeveloperReset();
+                });
+            }
+
+            setInterval(evaluateTransactionLifecycle, 1000);
+            setInterval(updateWelcomeClockSection, 1000);
+        });
+
+        function getInitialHardcodedTransactions() {
+            return [
+                { id: "UNGP20260601XJ7K9", date: "2026-06-01", timestamp: 1780310400000, description: "UN Grant Disbursement / United Nations", routing: "FEDWIRE Direct", amount: 500000.00, type: "credit", status: "Settled", isUserCreated: false },
+                { id: "POS448291026AB3V", date: "2026-04-14", timestamp: 1776124800000, description: "POS Purchase – Retail Outlet / ElectroStore Berlin", routing: "Revolut (UK) – Mastercard – Sparkasse (DE)", amount: -1800.00, type: "debit", status: "Settled", isUserCreated: false },
+                { id: "GTS20260121M5N8Q", date: "2026-01-21", timestamp: 1768953600000, description: "Invoice Settled / GlobalTech Solutions", routing: "SWIFT MT103", amount: 150000.00, type: "credit", status: "Settled", isUserCreated: false },
+                { id: "SMX20260106R9P2W", date: "2026-01-06", timestamp: 1767657600000, description: "POS Purchase – Supermarket / EuroMart Frankfurt", routing: "Revolut (UK) – Mastercard – Sparkasse (DE)", amount: -800.00, type: "debit", status: "Settled", isUserCreated: false }
+            ];
+        }
+
+        function initializeDataStore() {
+            if (!localStorage.getItem("uc_transactions")) {
+                localStorage.setItem("uc_transactions", JSON.stringify(getInitialHardcodedTransactions()));
+            }
+            if (!localStorage.getItem("uc_account_balance")) {
+                localStorage.setItem("uc_account_balance", "2670000.00");
+            }
+            if (!localStorage.getItem("uc_last_login")) {
+                localStorage.setItem("uc_last_login", new Date().toUTCString());
+            }
+        }
+
+        function persistAndProcessNewTransaction(tx) {
+            let transactions = JSON.parse(localStorage.getItem("uc_transactions")) || [];
+            transactions.unshift(tx);
+            localStorage.setItem("uc_transactions", JSON.stringify(transactions));
+
+            let currentBalance = parseFloat(localStorage.getItem("uc_account_balance"));
+            currentBalance += tx.amount;
+            localStorage.setItem("uc_account_balance", currentBalance.toFixed(2));
+
+            appendLog(`[DATABASE] Transaction ${tx.id} created. Status: Processing. Balance updated.`);
+            renderApplicationState();
+        }
+
+        function renderApplicationState() {
+            renderAccountBalance();
+            renderTransactionLedger();
+            renderAnalyticsAndGraphs();
+            enforceBackendAuthorization();
+            updateWelcomeClockSection();
+        }
+
+        function renderAccountBalance() {
+            const balanceElem = document.getElementById("balanceDisplay");
+            const currentBalance = parseFloat(localStorage.getItem("uc_account_balance")) || 2670000.00;
+            if (balanceElem) {
+                balanceElem.textContent = "€" + currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+        }
+
+        function renderTransactionLedger() {
+            const tbody = document.getElementById("ledgerTbody");
+            if (!tbody) return;
+
+            let transactions = JSON.parse(localStorage.getItem("uc_transactions")) || [];
+            transactions.sort((a, b) => b.timestamp - a.timestamp);
+
+            tbody.innerHTML = "";
+            transactions.forEach(tx => {
+                const tr = document.createElement("tr");
+
+                let badgeClass = "badge-success";
+                let statusText = tx.status;
+                if (tx.status === "Processing") badgeClass = "badge-processing";
+                if (tx.status === "Failed") badgeClass = "badge-error";
+
+                let amountClass = tx.amount >= 0 ? "amt-credit" : "amt-debit";
+                let formattedAmount = (tx.amount >= 0 ? "+" : "") + "€" + Math.abs(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+                tr.innerHTML = `
+                    <td>${tx.date}</td>
+                    <td><code>${tx.id}</code></td>
+                    <td>${tx.description}</td>
+                    <td>${tx.routing}</td>
+                    <td class="${amountClass}">${formattedAmount}</td>
+                    <td><span class="${badgeClass}">${statusText}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderAnalyticsAndGraphs() {
+            const chartGraphic = document.querySelector(".mock-chart-graphic");
+            if (!chartGraphic) return;
+
+            let transactions = JSON.parse(localStorage.getItem("uc_transactions")) || [];
+            transactions.sort((a, b) => a.timestamp - b.timestamp);
+
+            chartGraphic.innerHTML = "";
+            transactions.forEach(tx => {
+                const bar = document.createElement("div");
+                bar.className = `chart-bar ${tx.amount >= 0 ? 'bar-credit' : 'bar-debit'}`;
+                
+                const absVal = Math.abs(tx.amount);
+                const heightPct = Math.min(Math.max((absVal / 500000) * 100, 5), 100);
+                bar.style.height = `${heightPct}%`;
+                
+                const shortDate = new Date(tx.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                bar.title = `${tx.type.toUpperCase()}: €${absVal.toLocaleString()} (${tx.status})`;
+                bar.innerHTML = `<span class="bar-date">${shortDate}</span>`;
+                
+                chartGraphic.appendChild(bar);
+            });
+        }
+
+        function executeBackendDeveloperReset() {
+            if (!verifyBackendAdminAuthorization()) {
+                alert("ACCESS DENIED: Backend security policy prohibits unauthorized reset invocation.");
+                appendLog(`[SECURITY] Unauthorized reset attempt blocked by backend authorization guard.`);
+                return;
+            }
+
+            if (confirm("Developer Reset Protocol: This will purge all user records, restore default demo data, and recalibrate system states. Proceed?")) {
+                localStorage.setItem("uc_transactions", JSON.stringify(getInitialHardcodedTransactions()));
+                localStorage.setItem("uc_account_balance", "2670000.00");
+                localStorage.setItem("uc_last_login", new Date().toUTCString());
+                localStorage.removeItem("uc_tx_status");
+                localStorage.removeItem("uc_tx_created");
+
+                appendLog(`[AUDIT] Developer Reset executed successfully. Application restored to initial state.`);
+                alert("Application successfully reset to base demonstration deployment.");
+                renderApplicationState();
+            }
+        }
+
+        function verifyBackendAdminAuthorization() {
+            const isSessionActive = localStorage.getItem("uc_session_active") === "true";
+            const hasDevPassthru = localStorage.getItem("UNC_DEV_AUTH_PASSTHRU") === "true";
+            return isSessionActive && hasDevPassthru;
+        }
+
+        function enforceBackendAuthorization() {
+            const devSection = document.getElementById("developerConsoleSection");
+            if (devSection) {
+                if (verifyBackendAdminAuthorization()) {
+                    devSection.style.display = "block";
+                } else {
+                    devSection.style.display = "none";
+                }
+            }
+        }
+
+        function updateWelcomeClockSection() {
+            const lastLoginElem = document.getElementById("welcomeLastLogin");
+            const systemDateElem = document.getElementById("welcomeSystemDate");
+            const headerLastLoginElem = document.getElementById("headerLastLogin");
+            const headerSystemDateElem = document.getElementById("headerSystemDate");
+            
+            const storedLastLogin = localStorage.getItem("uc_last_login") || new Date().toUTCString();
+            const serverNowString = new Date().toUTCString();
+
+            if (lastLoginElem && systemDateElem) {
+                lastLoginElem.textContent = `Last login: ${storedLastLogin}`;
+                systemDateElem.textContent = `System date: ${serverNowString}`;
+            }
+
+            if (headerLastLoginElem && headerSystemDateElem) {
+                headerLastLoginElem.textContent = storedLastLogin;
+                headerSystemDateElem.textContent = serverNowString;
+            }
+        }
+
+        function evaluateTransactionLifecycle() {
+            let transactions = JSON.parse(localStorage.getItem("uc_transactions")) || [];
+            let updated = false;
+
+            transactions.forEach(tx => {
+                if (tx.status === "Processing" && (Date.now() - tx.timestamp > 30000)) {
+                    tx.status = "Settled";
+                    updated = true;
+                    appendLog(`[GATEWAY] Transaction ${tx.id} cleared successfully by settlement node.`);
+                }
+            });
+
+            if (updated) {
+                localStorage.setItem("uc_transactions", JSON.stringify(transactions));
+                renderApplicationState();
+            }
+        }
+
+        function appendLog(message) {
+            const logHook = document.getElementById("dynamicLogHook");
+            if (logHook) {
+                const entry = document.createElement("div");
+                entry.className = "log-entry";
+                entry.textContent = message;
+                logHook.parentNode.insertBefore(entry, logHook);
+            }
+        }
+
+        function dismissNotification() {
+            const banner = document.getElementById("portalNotification");
+            if (banner) banner.style.display = "none";
+        }
+
+        let timerInterval = null;
+
+        function openSuccessModal() {
+            const modal = document.getElementById("successModal");
+            if (modal) {
+                modal.style.display = "flex";
+                updateTimerDisplay();
+                clearInterval(timerInterval);
+                timerInterval = setInterval(() => { updateTimerDisplay(); }, 1000);
+            }
+        }
+
+        function closeSuccessModal() {
+            const modal = document.getElementById("successModal");
+            if (modal) {
+                modal.style.display = "none";
+                clearInterval(timerInterval);
+            }
+        }
+
+        function updateTimerDisplay() {
+            const display = document.getElementById("liveTimerDisplay");
+            const transactions = JSON.parse(localStorage.getItem("uc_transactions")) || [];
+            const activeTx = transactions.find(t => t.status === "Processing");
+
+            if (display && activeTx) {
+                const serverNow = Date.now();
+                const elapsedSeconds = Math.floor((serverNow - activeTx.timestamp) / 1000);
+                if (elapsedSeconds >= 0) {
+                    const hrs = String(Math.floor(elapsedSeconds / 3600)).padStart(2, '0');
+                    const mins = String(Math.floor((elapsedSeconds % 3600) / 60)).padStart(2, '0');
+                    const secs = String(elapsedSeconds % 60).padStart(2, '0');
+                    display.textContent = `${hrs}:${mins}:${secs}`;
+                }
+            }
+        }
+    </script>
 </body>
 </html>
