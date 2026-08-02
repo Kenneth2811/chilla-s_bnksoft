@@ -48,19 +48,23 @@ body, html {
     overflow-y: auto;
 }
 
-/* HEADER & RESPONSIVE METADATA STYLING */
+/* HEADER & RESPONSIVE METADATA STYLING (Optimized Header Width Constraint) */
 .dash-header {
     height: auto;
-    min-height: 70px;
+    min-height: 50px;
+    width: 100%;
+    max-width: 1560px;
+    margin: 0 auto;
     background: #ffffff; 
     border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center; 
     justify-content: space-between; 
-    padding: 10px 15px;
+    padding: 6px 16px;
     flex-shrink: 0;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
+    box-sizing: border-box;
 }
 
 .brand-logo {  
@@ -69,17 +73,17 @@ body, html {
 }
 
 .site-logo {
-	height: 45px;
+	height: 32px;
 	width: auto;
 	object-fit: contain;
 	display: block;
 }
 
-/* Modern Professional Banking Header Display for Last Login & System Date */
+/* Modern Professional Banking Header Display for System Date */
 .header-system-meta-container {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     flex-wrap: wrap;
     justify-content: flex-end;
 }
@@ -87,12 +91,12 @@ body, html {
 .header-system-meta {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     background: #F8FAFC;
     border: 1px solid #E2E8F0;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
     color: #475569;
 }
 
@@ -114,20 +118,18 @@ body, html {
 }
 
 .meta-divider {
-    width: 1px;
-    height: 12px;
-    background: #CBD5E1;
+    display: none;
 }
 
 .header-action-group {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .node-status { 
     color: var(--text-muted); 
-    font-size: 0.8rem; 
+    font-size: 0.75rem; 
     white-space: nowrap;
 }
 .status-active { color: var(--success); font-weight: 600; }
@@ -135,20 +137,20 @@ body, html {
 
 .btn-signout-custom {
     width: auto !important; 
-    padding: 6px 12px !important; 
+    padding: 4px 10px !important; 
     font-weight: 600 !important; 
     background: rgba(211, 16, 39, 0.1) !important; 
     border-color: rgba(211, 16, 39, 0.3) !important; 
     color: #F87171 !important;
-    font-size: 0.8rem !important;
+    font-size: 0.75rem !important;
 }
 
 .secure-tag {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--success); 
     font-weight: 600; 
     background: rgba(16, 185, 129, 0.08);
-    padding: 6px 12px;
+    padding: 4px 8px;
     border-radius: 20px; 
     border: 1px solid rgba(16, 185, 129, 0.2);
     white-space: nowrap;
@@ -181,7 +183,7 @@ body, html {
 }
 
 /* AUTH WORKSPACE */
-.auth-split-workspace { display: flex; flex-direction: column; flex-grow: 1; min-height: calc(100vh - 70px); }
+.auth-split-workspace { display: flex; flex-direction: column; flex-grow: 1; min-height: calc(100vh - 50px); }
 
 .auth-promo-panel {
     display: none; 
@@ -304,7 +306,7 @@ body, html {
     display: flex; 
     flex-direction: column; 
     flex-grow: 1; 
-    height: calc(100vh - 70px); 
+    height: calc(100vh - 50px); 
     overflow: hidden; 
 }
 
@@ -509,8 +511,8 @@ body, html {
 
 /* Tablet View (Min-width: 768px) */
 @media (min-width: 768px) {
-    .dash-header { padding: 0 30px; }
-    .site-logo { height: 60px; }
+    .dash-header { padding: 8px 24px; }
+    .site-logo { height: 38px; }
     .portal-notification { flex-direction: row; padding: 15px 30px; }
     .btn-close-notify { align-self: center; }
     
@@ -553,8 +555,8 @@ body, html {
 
 /* Laptop & Desktop View (Min-width: 1024px) */
 @media (min-width: 1024px) {
-    .dash-header { padding: 0 40px; }
-    .site-logo { height: 70px; }
+    .dash-header { padding: 8px 32px; }
+    .site-logo { height: 42px; }
     .portal-notification { padding: 15px 40px; }
     .auth-promo-panel { flex: 1.2; padding: 60px; }
     .auth-action-panel { padding: 0 60px; }
