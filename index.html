@@ -69,23 +69,19 @@
                 <img src="logo.png" alt="UniCredit Logo" class="site-logo" style="height: 110px; width: auto;">
             </div>
             
-            <!-- Modern Responsive Header Metadata (Last Login & System Date/Time) -->
-            <div class="header-system-meta-container">
+            <!-- Modern Responsive Header Metadata (Last Login Display) -->
+            <div class="header-system-meta-container" style="position: absolute; left: 50%; transform: translateX(-50%);">
                 <div class="header-system-meta">
                     <div class="meta-item">
-                        <span class="meta-label-lbl">Last Login:</span> 
-                        <span id="headerLastLogin">Loading...</span>
-                    </div>
-                    <div class="meta-divider"></div>
-                    <div class="meta-item">
-                        <span class="meta-label-lbl">System Date:</span> 
+                        <span class="meta-label-lbl">Last Login Date:</span> 
                         <span id="headerSystemDate">Loading...</span>
                     </div>
                 </div>
-                <div class="header-action-group">
-                    <div class="node-status">Session: <span id="headerStatus" class="status-active">Active</span></div>
-                    <button id="btnSignOut" class="btn-secondary btn-signout-custom">Sign Out</button>
-                </div>
+            </div>
+
+            <div class="header-action-group">
+                <div class="node-status">Session: <span id="headerStatus" class="status-active">Active</span></div>
+                <button id="btnSignOut" class="btn-secondary btn-signout-custom">Sign Out</button>
             </div>
         </header>
         
@@ -655,7 +651,6 @@
             }
 
             setInterval(evaluateTransactionLifecycle, 1000);
-            setInterval(updateWelcomeClockSection, 1000);
         });
 
         function getInitialHardcodedTransactions() {
@@ -701,7 +696,7 @@
             renderAnalyticsAndGraphs();
             renderAccountStatusDisplay();
             enforceBackendAuthorization();
-            updateWelcomeClockSection();
+            updateLastLoginDisplay();
         }
 
         function renderAccountBalance() {
@@ -843,16 +838,12 @@
             }
         }
 
-        function updateWelcomeClockSection() {
-            const headerLastLoginElem = document.getElementById("headerLastLogin");
+        function updateLastLoginDisplay() {
             const headerSystemDateElem = document.getElementById("headerSystemDate");
-            
-            const storedLastLogin = localStorage.getItem("uc_last_login") || new Date().toUTCString();
-            const serverNowString = new Date().toUTCString();
+            const lastLoginTime = localStorage.getItem("uc_last_login") || new Date().toUTCString();
 
-            if (headerLastLoginElem && headerSystemDateElem) {
-                headerLastLoginElem.textContent = storedLastLogin;
-                headerSystemDateElem.textContent = serverNowString;
+            if (headerSystemDateElem) {
+                headerSystemDateElem.textContent = lastLoginTime;
             }
         }
 
