@@ -48,16 +48,19 @@ body, html {
     overflow-y: auto;
 }
 
-/* HEADER */
-.bank-horizon-bar, .dash-header {
-    height: 70px;
+/* HEADER & RESPONSIVE METADATA STYLING */
+.dash-header {
+    height: auto;
+    min-height: 70px;
     background: #ffffff; 
     border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center; 
     justify-content: space-between; 
-    padding: 0 20px;
+    padding: 10px 15px;
     flex-shrink: 0;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .brand-logo {  
@@ -66,10 +69,78 @@ body, html {
 }
 
 .site-logo {
-	height: 120px;
+	height: 45px;
 	width: auto;
 	object-fit: contain;
 	display: block;
+}
+
+/* Modern Professional Banking Header Display for Last Login & System Date */
+.header-system-meta-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.header-system-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    color: #475569;
+}
+
+.meta-item {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.meta-label-lbl {
+    color: #64748B;
+    font-weight: 600;
+}
+
+.header-system-meta .meta-item span:last-child {
+    color: #0F172A;
+    font-weight: 600;
+}
+
+.meta-divider {
+    width: 1px;
+    height: 12px;
+    background: #CBD5E1;
+}
+
+.header-action-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.node-status { 
+    color: var(--text-muted); 
+    font-size: 0.8rem; 
+    white-space: nowrap;
+}
+.status-active { color: var(--success); font-weight: 600; }
+.status-hold { color: var(--hold-yellow); font-weight: 600; }
+
+.btn-signout-custom {
+    width: auto !important; 
+    padding: 6px 12px !important; 
+    font-weight: 600 !important; 
+    background: rgba(211, 16, 39, 0.1) !important; 
+    border-color: rgba(211, 16, 39, 0.3) !important; 
+    color: #F87171 !important;
+    font-size: 0.8rem !important;
 }
 
 .secure-tag {
@@ -82,10 +153,6 @@ body, html {
     border: 1px solid rgba(16, 185, 129, 0.2);
     white-space: nowrap;
 }
-
-.node-status { color: var(--text-muted); font-size: 0.85rem; }
-.status-active { color: var(--success); font-weight: 600; }
-.status-hold { color: var(--hold-yellow); font-weight: 600; }
 
 /* PORTAL NOTIFICATION */
 .portal-notification {
@@ -117,7 +184,7 @@ body, html {
 .auth-split-workspace { display: flex; flex-direction: column; flex-grow: 1; min-height: calc(100vh - 70px); }
 
 .auth-promo-panel {
-    display: none; /* Hidden on small mobile to prioritize login form access */
+    display: none; 
     position: relative; 
     overflow: hidden; 
     padding: 40px; 
@@ -255,7 +322,7 @@ body, html {
 }
 
 .sidebar-section-title { 
-    display: none; /* Hide section text headers in horizontal mobile scroll view */
+    display: none;
 }
 
 .nav-item { 
@@ -442,8 +509,8 @@ body, html {
 
 /* Tablet View (Min-width: 768px) */
 @media (min-width: 768px) {
-    .bank-horizon-bar, .dash-header { padding: 0 30px; }
-    .site-logo { height: 140px; }
+    .dash-header { padding: 0 30px; }
+    .site-logo { height: 60px; }
     .portal-notification { flex-direction: row; padding: 15px 30px; }
     .btn-close-notify { align-self: center; }
     
@@ -486,8 +553,8 @@ body, html {
 
 /* Laptop & Desktop View (Min-width: 1024px) */
 @media (min-width: 1024px) {
-    .bank-horizon-bar, .dash-header { padding: 0 40px; }
-    .site-logo { height: 160px; }
+    .dash-header { padding: 0 40px; }
+    .site-logo { height: 70px; }
     .portal-notification { padding: 15px 40px; }
     .auth-promo-panel { flex: 1.2; padding: 60px; }
     .auth-action-panel { padding: 0 60px; }
