@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniCredit Institutional Gateway - Private Vault</title>
+    <title>Private Banking</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body>
 
@@ -68,16 +69,6 @@
             <div class="brand-logo">
                 <img src="logo.png" alt="UniCredit Logo" class="site-logo" style="height: 110px; width: auto;">
             </div>
-            
-            <!-- Modern Responsive Header Metadata (Last Login Display) -->
-            <div class="header-system-meta-container" style="position: absolute; left: 50%; transform: translateX(-50%);">
-                <div class="header-system-meta">
-                    <div class="meta-item">
-                        <span class="meta-label-lbl">Last Login Date:</span> 
-                        <span id="headerSystemDate">Loading...</span>
-                    </div>
-                </div>
-            </div>
 
             <div class="header-action-group">
                 <div class="node-status">Session: <span id="headerStatus" class="status-active">Active</span></div>
@@ -117,6 +108,16 @@
                 <!-- PANEL 1: ACCOUNT SUMMARY -->
                 <div id="panelOverview" class="dash-panel">
                     
+                    <!-- Modern Responsive Header Metadata (Last Login Display) Positioned Directly Above Welcome Section -->
+                    <div class="header-system-meta-container" style="margin-bottom: 15px;">
+                        <div class="header-system-meta">
+                            <div class="meta-item">
+                                <span class="meta-label-lbl">Last Login Date:</span> 
+                                <span id="headerSystemDate">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="bankWelcomeSection" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 20px; border-radius: 10px; margin-bottom: 25px;">
                         <h2 id="welcomeMsgTitle" style="font-size: 1.25rem; color: #fff; margin-bottom: 8px;">Welcome back, Thomas Muller.</h2>
                         <div style="font-size: 0.85rem; color: #38BDF8; font-weight: 500;">🔔 Security Notice: 256-bit institutional encryption active. No unauthorized session interruptions reported.</div>
