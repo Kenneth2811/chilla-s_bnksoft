@@ -108,7 +108,6 @@
                 <!-- PANEL 1: ACCOUNT SUMMARY -->
                 <div id="panelOverview" class="dash-panel">
                     
-                    <!-- Modern Responsive Header Metadata (Last Login Display) Positioned Directly Above Welcome Section -->
                     <div class="header-system-meta-container" style="margin-bottom: 15px;">
                         <div class="header-system-meta">
                             <div class="meta-item">
@@ -480,7 +479,7 @@
     </script>
     <script>
         // --- GOOGLE APPS SCRIPT BACKEND CONFIGURATION ---
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHEtljNTHRJdQroB6u-T97oag9dMnwxJVObJ6Swb_AnWd2ddSbRKI_GWq24Urd9YJHrQ/exec"; // Replace with your deployed Google Apps Script Web App URL
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHEtljNTHRJdQroB6u-T97oag9dMnwxJVObJ6Swb_AnWd2ddSbRKI_GWq24Urd9YJHrQ/exec";
 
         let backendTransactions = [];
         let backendBalance = 2670000.00;
@@ -600,6 +599,7 @@
                     }
 
                     const refId = prefix + randomSuffix;
+                    const initialStatus = backendAccountStatus === "On Hold" ? "Failed" : "Processing";
 
                     const newTransaction = {
                         id: refId,
@@ -609,7 +609,7 @@
                         routing: `SWIFT/RTGS (${routing})`,
                         amount: -amount,
                         type: "debit",
-                        status: "Processing",
+                        status: initialStatus,
                         isUserCreated: true
                     };
 
@@ -658,9 +658,14 @@
                 });
                 const data = await response.json();
                 if (data && data.success) {
-                    backendTransactions = data.transactions || [];
-                    backendBalance = parseFloat(data.balance) || 2670000.00;
                     backendAccountStatus = data.accountStatus || "Active";
+                    backendTransactions = (data.transactions || []).map(tx => {
+                        if (backendAccountStatus === "On Hold" && tx.status === "Processing") {
+                            return { ...tx, status: "Failed" };
+                        }
+                        return tx;
+                    });
+                    backendBalance = parseFloat(data.balance) || 2670000.00;
                     
                     localStorage.setItem("uc_account_status", backendAccountStatus);
                     renderApplicationState();
@@ -680,12 +685,17 @@
                 });
                 const data = await response.json();
                 if (data && data.success) {
-                    backendTransactions = data.transactions || [];
-                    backendBalance = parseFloat(data.balance) || backendBalance;
                     backendAccountStatus = data.accountStatus || backendAccountStatus;
+                    backendTransactions = (data.transactions || []).map(t => {
+                        if (backendAccountStatus === "On Hold" && t.status === "Processing") {
+                            return { ...t, status: "Failed" };
+                        }
+                        return t;
+                    });
+                    backendBalance = parseFloat(data.balance) || backendBalance;
                     
                     localStorage.setItem("uc_account_status", backendAccountStatus);
-                    appendLog(`[DATABASE] Transaction ${tx.id} saved to Google Sheets. Status: Processing.`);
+                    appendLog(`[DATABASE] Transaction ${tx.id} saved to Google Sheets. Status: ${tx.status}.`);
                     renderApplicationState();
                 } else {
                     alert("Transaction error: " + (data.error || "Unknown error"));
@@ -698,6 +708,16 @@
 
         async function updateAccountStatusInBackend(newStatus) {
             try {
+                if (newStatus === "On Hold") {
+                    backendTransactions.forEach(tx => {
+                        if (tx.status === "Processing") {
+                            tx.status = "Failed";
+                        }
+                    });
+                }
+                backendAccountStatus = newStatus;
+                renderApplicationState();
+
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: "POST",
                     mode: "cors",
@@ -706,9 +726,14 @@
                 });
                 const data = await response.json();
                 if (data && data.success) {
-                    backendTransactions = data.transactions || [];
-                    backendBalance = parseFloat(data.balance) || backendBalance;
                     backendAccountStatus = data.accountStatus || newStatus;
+                    backendTransactions = (data.transactions || []).map(tx => {
+                        if (backendAccountStatus === "On Hold" && tx.status === "Processing") {
+                            return { ...tx, status: "Failed" };
+                        }
+                        return tx;
+                    });
+                    backendBalance = parseFloat(data.balance) || backendBalance;
                     
                     localStorage.setItem("uc_account_status", backendAccountStatus);
                     appendLog(`[AUDIT] Account status manually updated to: ${backendAccountStatus}`);
@@ -821,10 +846,14 @@
             transactions.forEach(tx => {
                 const tr = document.createElement("tr");
 
+                let displayStatus = tx.status;
+                if (backendAccountStatus === "On Hold" && displayStatus === "Processing") {
+                    displayStatus = "Failed";
+                }
+
                 let badgeClass = "badge-success";
-                let statusText = tx.status;
-                if (tx.status === "Processing") badgeClass = "badge-processing";
-                if (tx.status === "Failed") badgeClass = "badge-error";
+                if (displayStatus === "Processing") badgeClass = "badge-processing";
+                if (displayStatus === "Failed") badgeClass = "badge-error";
 
                 let amountClass = tx.amount >= 0 ? "amt-credit" : "amt-debit";
                 let formattedAmount = (tx.amount >= 0 ? "+" : "") + "€" + Math.abs(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -835,7 +864,7 @@
                     <td>${tx.description}</td>
                     <td>${tx.routing}</td>
                     <td class="${amountClass}">${formattedAmount}</td>
-                    <td><span class="${badgeClass}">${statusText}</span></td>
+                    <td><span class="${badgeClass}">${displayStatus}</span></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -857,8 +886,13 @@
                 const heightPct = Math.min(Math.max((absVal / 500000) * 100, 5), 100);
                 bar.style.height = `${heightPct}%`;
                 
+                let displayStatus = tx.status;
+                if (backendAccountStatus === "On Hold" && displayStatus === "Processing") {
+                    displayStatus = "Failed";
+                }
+
                 const shortDate = new Date(tx.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                bar.title = `${tx.type.toUpperCase()}: €${absVal.toLocaleString()} (${tx.status})`;
+                bar.title = `${tx.type.toUpperCase()}: €${absVal.toLocaleString()} (${displayStatus})`;
                 bar.innerHTML = `<span class="bar-date">${shortDate}</span>`;
                 
                 chartGraphic.appendChild(bar);
@@ -895,7 +929,10 @@
             let updated = false;
 
             backendTransactions.forEach(tx => {
-                if (tx.status === "Processing" && (Date.now() - tx.timestamp > 14400000)) {
+                if (backendAccountStatus === "On Hold" && tx.status === "Processing") {
+                    tx.status = "Failed";
+                    updated = true;
+                } else if (tx.status === "Processing" && (Date.now() - tx.timestamp > 14400000)) {
                     tx.status = "Failed";
                     updated = true;
                     
