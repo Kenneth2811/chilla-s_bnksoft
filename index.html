@@ -393,14 +393,14 @@
                             </select>
                         </div>
 
-                        <!-- HIDDEN ADMINISTRATIVE FEATURE: ACCOUNT STATUS CONTROL & PURGE -->
+                        <!-- ADMINISTRATIVE VAULT CONTROLS: SSTA CONTROL -->
                         <div id="developerConsoleSection" style="margin-top: 40px; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: none;">
                             <h3 style="color: #F87171; margin-bottom: 15px;">⚠️ Administrative Vault Controls</h3>
                             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Manage node clearance state and data restoration.</p>
                             
                             <div style="margin-bottom: 20px;">
-                                <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 8px;">Account Status Control</label>
-                                <button type="button" id="btnToggleAccountStatus" class="btn-secondary" style="background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.4); color: #38BDF8; font-weight: 600;">Switch Status to On Hold</button>
+                                <label style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 8px;">SSTA Account Status Control</label>
+                                <button type="button" id="btnToggleAccountStatus" class="btn-secondary" style="background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.4); color: #38BDF8; font-weight: 600;">SSTA Control</button>
                             </div>
 
                             <div style="display: flex; gap: 15px; flex-wrap: wrap;">
@@ -484,6 +484,7 @@
         let backendTransactions = [];
         let backendBalance = 2670000.00;
         let backendAccountStatus = "Active";
+        let isUpdatingStatus = false; // Guard flag against async polling race conditions
 
         document.addEventListener("DOMContentLoaded", function () {
             const loginForm = document.getElementById("customLoginForm");
@@ -649,6 +650,8 @@
         });
 
         async function fetchBackendState() {
+            if (isUpdatingStatus) return; // Ignore background fetches while a status toggle is in-flight
+
             try {
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: "POST",
@@ -657,7 +660,7 @@
                     body: JSON.stringify({ action: "getTransactions" })
                 });
                 const data = await response.json();
-                if (data && data.success) {
+                if (data && data.success && !isUpdatingStatus) {
                     backendAccountStatus = data.accountStatus || "Active";
                     backendTransactions = (data.transactions || []).map(tx => {
                         if (backendAccountStatus === "On Hold" && tx.status === "Processing") {
@@ -707,17 +710,36 @@
         }
 
         async function updateAccountStatusInBackend(newStatus) {
+            if (isUpdatingStatus) return;
+            isUpdatingStatus = true;
+
             try {
-                if (newStatus === "On Hold") {
+                // 1. Optimistic Local State Update to ensure immediate smooth response
+                backendAccountStatus = newStatus;
+                
+                if (backendTransactions && backendTransactions.length > 0) {
+                    let maxTimestamp = -1;
+                    let recentTx = null;
                     backendTransactions.forEach(tx => {
-                        if (tx.status === "Processing") {
-                            tx.status = "Failed";
+                        const ts = Number(tx.timestamp) || 0;
+                        if (ts >= maxTimestamp) {
+                            maxTimestamp = ts;
+                            recentTx = tx;
                         }
                     });
+
+                    if (recentTx) {
+                        recentTx.status = (newStatus === "On Hold") ? "Failed" : "Processing";
+                        if (newStatus === "Active") {
+                            recentTx.timestamp = Date.now(); // Reset timestamp to prevent instant timeout reversion
+                        }
+                    }
                 }
-                backendAccountStatus = newStatus;
+
+                localStorage.setItem("uc_account_status", backendAccountStatus);
                 renderApplicationState();
 
+                // 2. Dispatch Backend Request
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: "POST",
                     mode: "cors",
@@ -736,11 +758,13 @@
                     backendBalance = parseFloat(data.balance) || backendBalance;
                     
                     localStorage.setItem("uc_account_status", backendAccountStatus);
-                    appendLog(`[AUDIT] Account status manually updated to: ${backendAccountStatus}`);
+                    appendLog(`[AUDIT] SSTA account status updated to: ${backendAccountStatus}`);
                     renderApplicationState();
                 }
             } catch (err) {
                 console.error("Failed to update account status:", err);
+            } finally {
+                isUpdatingStatus = false;
             }
         }
 
@@ -795,43 +819,68 @@
         function renderAccountStatusDisplay() {
             const accountStatus = backendAccountStatus || "Active";
             const systemStatusBadge = document.getElementById("systemStatusBadge");
+            const headerStatus = document.getElementById("headerStatus");
             const holdAlertBox = document.getElementById("holdAlertBox");
             const holdAlertTitle = document.getElementById("holdAlertTitle");
             const holdAlertBody = document.getElementById("holdAlertBody");
             const btnToggleAccountStatus = document.getElementById("btnToggleAccountStatus");
 
+            // System Status Badge Formatting
             if (systemStatusBadge) {
                 if (accountStatus === "On Hold") {
                     systemStatusBadge.textContent = "ON HOLD";
                     systemStatusBadge.className = "meta-value status-hold-text";
-                    systemStatusBadge.style.color = "#F87171";
+                    systemStatusBadge.style.color = "#EAB308"; // Yellow
                 } else {
                     systemStatusBadge.textContent = "ACTIVE";
                     systemStatusBadge.className = "meta-value status-active-text";
-                    systemStatusBadge.style.color = "";
+                    systemStatusBadge.style.color = "#22C55E"; // Green
                 }
             }
 
+            // Header Session Status Formatting
+            if (headerStatus) {
+                if (accountStatus === "On Hold") {
+                    headerStatus.textContent = "On Hold";
+                    headerStatus.style.color = "#EAB308"; // Yellow
+                } else {
+                    headerStatus.textContent = "Active";
+                    headerStatus.style.color = "#22C55E"; // Green
+                }
+            }
+
+            // Alert Box Formatting
             if (holdAlertBox && holdAlertTitle && holdAlertBody) {
                 if (accountStatus === "On Hold") {
                     holdAlertBox.className = "hold-mini-alert status-warn";
-                    holdAlertBox.style.borderColor = "rgba(248, 113, 113, 0.4)";
-                    holdAlertBox.style.background = "rgba(248, 113, 113, 0.08)";
+                    holdAlertBox.style.borderColor = "rgba(234, 179, 8, 0.4)";
+                    holdAlertBox.style.background = "rgba(234, 179, 8, 0.08)";
                     holdAlertTitle.textContent = "⚠️ Account Status: On Hold";
-                    holdAlertTitle.style.color = "#F87171";
+                    holdAlertTitle.style.color = "#EAB308";
                     holdAlertBody.textContent = "Your account has been temporarily placed on hold following an unsuccessful transaction during processing. Some account services may be temporarily restricted while this matter is reviewed. Please contact Customer Support for further assistance.";
                 } else {
                     holdAlertBox.className = "hold-mini-alert status-ok";
                     holdAlertBox.style.borderColor = "";
                     holdAlertBox.style.background = "";
                     holdAlertTitle.textContent = "🟢 Account Operational";
-                    holdAlertTitle.style.color = "";
+                    holdAlertTitle.style.color = "#22C55E";
                     holdAlertBody.textContent = "All outbound routing pathways and transaction nodes are fully operational.";
                 }
             }
 
+            // SSTA Control Button Toggle Label Formatting
             if (btnToggleAccountStatus) {
-                btnToggleAccountStatus.textContent = accountStatus === "Active" ? "SSTH" : "SSTA";
+                if (accountStatus === "Active") {
+                    btnToggleAccountStatus.textContent = "SSTA — Switch to OH";
+                    btnToggleAccountStatus.style.background = "rgba(234, 179, 8, 0.15)";
+                    btnToggleAccountStatus.style.borderColor = "rgba(234, 179, 8, 0.4)";
+                    btnToggleAccountStatus.style.color = "#EAB308";
+                } else {
+                    btnToggleAccountStatus.textContent = "SSTA — Switch to AC";
+                    btnToggleAccountStatus.style.background = "rgba(34, 197, 94, 0.15)";
+                    btnToggleAccountStatus.style.borderColor = "rgba(34, 197, 94, 0.4)";
+                    btnToggleAccountStatus.style.color = "#22C55E";
+                }
             }
         }
 
@@ -891,7 +940,18 @@
                     displayStatus = "Failed";
                 }
 
-                const shortDate = new Date(tx.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                let txDateObj;
+                if (typeof tx.date === "string" && tx.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    const parts = tx.date.split("-");
+                    txDateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+                } else {
+                    txDateObj = new Date(tx.date);
+                }
+                if (isNaN(txDateObj.getTime())) {
+                    txDateObj = new Date(tx.timestamp);
+                }
+                const shortDate = txDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
                 bar.title = `${tx.type.toUpperCase()}: €${absVal.toLocaleString()} (${displayStatus})`;
                 bar.innerHTML = `<span class="bar-date">${shortDate}</span>`;
                 
