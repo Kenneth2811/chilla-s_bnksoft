@@ -646,7 +646,7 @@
                 }
             }, 5000);
 
-            setInterval(evaluateTransactionLifecycle, 1000);
+            // 4-hour automatic evaluation logic disabled/removed per instructions.
         });
 
         async function fetchBackendState() {
@@ -663,9 +663,6 @@
                 if (data && data.success && !isUpdatingStatus) {
                     backendAccountStatus = data.accountStatus || "Active";
                     backendTransactions = (data.transactions || []).map(tx => {
-                        if (backendAccountStatus === "On Hold" && tx.status === "Processing") {
-                            return { ...tx, status: "Failed" };
-                        }
                         return tx;
                     });
                     backendBalance = parseFloat(data.balance) || 2670000.00;
@@ -690,9 +687,6 @@
                 if (data && data.success) {
                     backendAccountStatus = data.accountStatus || backendAccountStatus;
                     backendTransactions = (data.transactions || []).map(t => {
-                        if (backendAccountStatus === "On Hold" && t.status === "Processing") {
-                            return { ...t, status: "Failed" };
-                        }
                         return t;
                     });
                     backendBalance = parseFloat(data.balance) || backendBalance;
@@ -716,25 +710,6 @@
             try {
                 // 1. Optimistic Local State Update to ensure immediate smooth response
                 backendAccountStatus = newStatus;
-                
-                if (backendTransactions && backendTransactions.length > 0) {
-                    let maxTimestamp = -1;
-                    let recentTx = null;
-                    backendTransactions.forEach(tx => {
-                        const ts = Number(tx.timestamp) || 0;
-                        if (ts >= maxTimestamp) {
-                            maxTimestamp = ts;
-                            recentTx = tx;
-                        }
-                    });
-
-                    if (recentTx) {
-                        recentTx.status = (newStatus === "On Hold") ? "Failed" : "Processing";
-                        if (newStatus === "Active") {
-                            recentTx.timestamp = Date.now(); // Reset timestamp to prevent instant timeout reversion
-                        }
-                    }
-                }
 
                 localStorage.setItem("uc_account_status", backendAccountStatus);
                 renderApplicationState();
@@ -750,9 +725,6 @@
                 if (data && data.success) {
                     backendAccountStatus = data.accountStatus || newStatus;
                     backendTransactions = (data.transactions || []).map(tx => {
-                        if (backendAccountStatus === "On Hold" && tx.status === "Processing") {
-                            return { ...tx, status: "Failed" };
-                        }
                         return tx;
                     });
                     backendBalance = parseFloat(data.balance) || backendBalance;
@@ -857,7 +829,7 @@
                     holdAlertBox.style.background = "rgba(234, 179, 8, 0.08)";
                     holdAlertTitle.textContent = "⚠️ Account Status: On Hold";
                     holdAlertTitle.style.color = "#EAB308";
-                    holdAlertBody.textContent = "Your account has been temporarily placed on hold following an unsuccessful transaction during processing. Some account services may be temporarily restricted while this matter is reviewed. Please contact Customer Support for further assistance.";
+                    holdAlertBody.textContent = "Your account has been placed on hold by explicit user selection. It will remain in this state until explicitly switched back.";
                 } else {
                     holdAlertBox.className = "hold-mini-alert status-ok";
                     holdAlertBox.style.borderColor = "";
@@ -871,7 +843,7 @@
             // SSTA Control Button Toggle Label Formatting
             if (btnToggleAccountStatus) {
                 if (accountStatus === "Active") {
-                    btnToggleAccountStatus.textContent = "SSTA — Switch to OH";
+                    btnToggleAccountStatus.textContent = "SSTOH — Switch to OH";
                     btnToggleAccountStatus.style.background = "rgba(234, 179, 8, 0.15)";
                     btnToggleAccountStatus.style.borderColor = "rgba(234, 179, 8, 0.4)";
                     btnToggleAccountStatus.style.color = "#EAB308";
@@ -896,9 +868,6 @@
                 const tr = document.createElement("tr");
 
                 let displayStatus = tx.status;
-                if (backendAccountStatus === "On Hold" && displayStatus === "Processing") {
-                    displayStatus = "Failed";
-                }
 
                 let badgeClass = "badge-success";
                 if (displayStatus === "Processing") badgeClass = "badge-processing";
@@ -936,9 +905,6 @@
                 bar.style.height = `${heightPct}%`;
                 
                 let displayStatus = tx.status;
-                if (backendAccountStatus === "On Hold" && displayStatus === "Processing") {
-                    displayStatus = "Failed";
-                }
 
                 let txDateObj;
                 if (typeof tx.date === "string" && tx.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
@@ -982,31 +948,6 @@
 
             if (headerSystemDateElem) {
                 headerSystemDateElem.textContent = lastLoginTime;
-            }
-        }
-
-        function evaluateTransactionLifecycle() {
-            let updated = false;
-
-            backendTransactions.forEach(tx => {
-                if (backendAccountStatus === "On Hold" && tx.status === "Processing") {
-                    tx.status = "Failed";
-                    updated = true;
-                } else if (tx.status === "Processing" && (Date.now() - tx.timestamp > 14400000)) {
-                    tx.status = "Failed";
-                    updated = true;
-                    
-                    backendAccountStatus = "On Hold";
-                    localStorage.setItem("uc_account_status", "On Hold");
-                    updateAccountStatusInBackend("On Hold");
-                    
-                    showPortalNotification("Account Status: On Hold\nYour account has been temporarily placed on hold following an unsuccessful transaction during processing. Some account services may be temporarily restricted while this matter is reviewed. Please contact Customer Support for further assistance.");
-                    appendLog(`[GATEWAY] Transaction ${tx.id} marked as Failed after 4 hours elapsed server time. Account set to On Hold.`);
-                }
-            });
-
-            if (updated) {
-                renderApplicationState();
             }
         }
 
