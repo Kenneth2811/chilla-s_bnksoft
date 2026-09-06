@@ -518,7 +518,7 @@
                         localStorage.setItem("uc_session_active", "true");
                         localStorage.setItem(DEVELOPER_ROLE_KEY, "true");
                         
-                        const currentLoginTime = new Date().toLocaleString('de-DE', { timeZone: 'Europe/Berlin' });
+                        const currentLoginTime = new Date().toLocaleString('en-GB', { timeZone: 'Europe/Berlin', weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
                         localStorage.setItem("uc_last_login", currentLoginTime);
 
                         appendLog(`[AUTH] Clearance granted for corporate identifier: ${VALID_USER}`);
@@ -911,7 +911,7 @@
                     const parts = tx.date.split("-");
                     txDateObj = new Date(parts[0], parts[1] - 1, parts[2]);
                 } else {
-                    txDateObj = new Date(tx.date);
+                    txDateObj = new Date(tx.timestamp);
                 }
                 if (isNaN(txDateObj.getTime())) {
                     txDateObj = new Date(tx.timestamp);
@@ -944,7 +944,7 @@
 
         function updateLastLoginDisplay() {
             const headerSystemDateElem = document.getElementById("headerSystemDate");
-            const lastLoginTime = localStorage.getItem("uc_last_login") || new Date().toLocaleString('de-DE', { timeZone: 'Europe/Berlin' });
+            const lastLoginTime = localStorage.getItem("uc_last_login") || new Date().toLocaleString('en-GB', { timeZone: 'Europe/Berlin', weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
             if (headerSystemDateElem) {
                 headerSystemDateElem.textContent = lastLoginTime;
